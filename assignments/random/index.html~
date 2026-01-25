@@ -1,0 +1,137 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>COS 432/ECE 432 - Fall 2021</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="../../css/logo-nav.css" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="../../index.html">
+          <img src="../../images/key.svg" width="60" height="60" alt=""> COS 432/ECE 432 - Fall 2021
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="../../index.html">Overview
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../../schedule.html">Schedule</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../../assignments.html">Assignments</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../../resources.html">Resources</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container-fluid">
+      <h5 class="mt-5">Assignment 1: Pseudo-Random Generator</h5>
+<ul class="text-right list-inline">
+   <li class="list-inline-item"><a class="social-icon text-xs-center" target="_blank" href="cos432-random.zip">Download Files &dArr;</a></li>
+   <li class="list-inline-item"><a class="social-icon text-xs-center" target="_blank" href="https://www.gradescope.com/">Submit Files &uArr;</a></li>
+</ul>
+
+<h5 class="mt-5">Introduction</h5>
+      <p>In this project, you will implement your own pseudo-random number generator (PRG) in Java. We will give you some of the code you need, and we will ask you to provide certain functions missing from the code we provide.</p>
+            
+      <p><code>PRF.java</code>: This is a fully implemented code file which we are giving you. You should use it as a building block for all of the crypto functionality you need to do this assignment. The file gives you access to a pseudo-random function, as described in lecture. This is the only crypto primitive you are allowed to use any other crypto you use must be built (by you) on top of this file. Specifically, you may not use any other crypto libraries, not even the ones that are part of the standard Java libraries.</p>
+            
+      <p>Your task is to implement two cryptographic algorithms, by modifying two Java code files as described below.</p>
+      
+      <p><code>PRGen.java</code> is a partially implemented file for  a pseudo-random generator class. Some parts are stubbed out. You will replace the stubbed out pieces with code that actually works and provides the required security guarantee. We have put a comment indicating <code>IMPLEMENT THIS</code> everywhere that you have to supply code.</p>
+      
+      <p><code>StreamCipher.java</code> is a partially implemented file for a stream cipher. Some parts are stubbed out. You will replace the stubbed out pieces with code that actually works and provides the required security guarantee. We have put a comment indicating <code>IMPLEMENT THIS</code> everywhere that you have to supply code.</p>
+
+      <h5 class="mt-5">Objectives of this assignment</h5>
+      <ul>
+        <li>Learn the common mistakes made in PRG design and implementation.</li>
+        <li>Understand the risks of insecure PRGs.</li>
+        <li>Gain experience writing cryptographic programs.</li>
+      </ul>
+      
+      <h5 class="mt-5">PRGen.java</h5>
+      <p>Your PRGen class should implement the following API:</p>
+      <code><pre>
+public class PRGen extends Random {
+   public PRGen(byte[] key)     // creates a new PRGen
+   protected int next(int bits) // generates the next pseudorandom number      </pre></code>
+
+      <p>Your PRGen class will extend the <a href="https://docs.oracle.com/javase/8/docs/api/java/util/Random.html" target="_blank">java.util.Random</a> class, but you should only implement the constructor and "next" method specified above. Your "next" method should follow the same behavior as the java.util.Random.next method. The Java <a href="https://docs.oracle.com/javase/8/docs/api/java/util/Random.html#next-int-" target="_blank">documentation</a> says, "The general contract of next is that it returns an int value and if the argument bits is between <code>1</code> and <code>32</code> (inclusive), then that many low-order bits of the returned value will be (approximately) independently chosen bit values, each of which is (approximately) equally likely to be <code>0</code> or <code>1</code>." For example, if you call <code>next(4)</code>, it will return a pseudo-random <code>int</code> between <code>0</code> and <code>15</code> (the range of 4-bit unsigned number). If you call <code>next(31)</code>, it will return a pseudo-random <code>int</code> between <code>0</code> and <code>2,147,483,647</code> (the range of an unsigned 31-bit number). If you call <code>next(32)</code>, it will return a pseudo-random <code>int</code> between <code>-2,147,483,648</code> and <code>2,147,483,647</code> (the range of a signed 32-bit number).</p>
+      <p>Your <code>PRGen</code> class must also obey the following three properties:</p>
+      <ul>
+        <li>It must be <b>pseudorandom</b>, meaning that there is no (known) way to distinguish its output from that of a truly random generator, unless you know the key.</li>
+        <li>It must be <b>deterministic</b>, meaning that if two programs create generators with the same seed, and then the two programs make the same sequence of calls to their generators, they should receive the same return values from all of those calls.
+</li>
+        <li>It must be <b>forward-secure</b>, meaning that if an adversary is able to observe the full state of the generator at some point in time, that adversary cannot reconstruct any of the output that was produced by previous calls to the generator. Note that the <code>.next</code> method in <code>java.util.Random</code> is not forward-secure.</li>
+      </ul>
+
+
+      <h5 class="mt-5">StreamCipher.java</h5>
+      <p>Your StreamCipher class should implement the following API:</p>
+      <code><pre>
+public class StreamCipher {
+   public StreamCipher(byte[] key, byte[] nonceArr, int nonceOffset)   // constructor 
+   public StreamCipher(byte[] key, byte[] nonce)                       // constructor 
+   public byte cryptByte(byte in)                                      // encrypts the next byte
+   public void cryptBytes(byte[] inBuf, int inOffset,                  // encrypts next numBytes
+                          byte[] outBuf, int outOffset,                // in the inBuf, writing
+                          int numBytes)                                // results to the outBuf
+}      </pre></code>
+
+      <p>This class encrypts or decrypts a stream of bytes, using a stream cipher. (Recall that for a stream cipher, encryption and decryption are the same operation.)</p>
+
+      <h5 class="mt-5">Getting Started</h5>
+      <ul>
+    <li>Download the starting code <a href="./cos432-random.zip">here</a>.</li>
+    <li>Make sure you understand what a PRF (pseudo-random function) is, and how you can use the provided <code>PRF.java</code> class to deterministically generate pseudo-random values. See the comments in <code>PRF.java</code> for examples.</li>
+    <li>The specification is deliberately vague regarding how you should accomplish each task. There is a significant design component to each problem.</li>
+    <li>The bulk of the work for this assignment will be in the design, not the implementation. It shouldn’t take many additional lines of code to complete the classes.</li>
+    <li>Advice on testing crypto code:  As always, it is important to test your code. But you should be aware that crypto code presents different testing issues than other code does. Testing can sanity- check your code, but it can’t verify that your code has the desired security properties. For example, if your code is encrypting data for confidentiality, you can test whether the ciphertext is the right size, and you can test whether the ciphertext looks kind of randomish, and you can test whether different plaintexts yield different ciphertexts. But you cannot test whether there is a way for an adversary to recover the plaintext. So by all means test your code — if you do not, it’s almost certain not to work — but remember that passing the tests is not enough.</li>
+      </ul>
+      <h5 class="mt-5">Submission Checklist</h5>
+      <p>Submit your files to <a href="https://www.gradescope.com/">Gradescope<a>:</p>
+      <ul style="list-style-type:none;">
+	<li>&#9633; <code>PRGen.java</code> - Source code file containing your implementation of the <code>PRGen</code> class.</li>
+	<li>&#9633; <code>StreamCipher.java</code> - Source code file containing your implementation of the <code>StreamCipher</code> class.</li>
+      </ul>  
+
+    </div>
+
+
+
+    </div>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+  </body>
+
+</html>
