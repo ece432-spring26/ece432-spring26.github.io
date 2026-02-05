@@ -1,0 +1,210 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>COS 432/ECE 432 - Fall 2021</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="../../css/logo-nav.css" rel="stylesheet">
+
+    <!-- MatJax-->
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML' async></script>
+
+
+  </head>
+
+  <body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="../../index.html">
+          <img src="../../images/key.svg" width="60" height="60" alt=""> COS 432/ECE 432 - Fall 2021
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="../../index.html">Overview
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../../schedule.html">Schedule</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../../assignments.html">Assignments</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../../resources.html">Resources</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container-fluid">
+      <h5 class="mt-5">Assignment 2: Asymmetric Cryptography</h5>
+<ul class="text-right list-inline">
+   <li class="list-inline-item"><a class="social-icon text-xs-center" target="_blank" href="cos432-asymmetric.zip">Download Files &dArr;</a></li>
+   <li class="list-inline-item"><a class="social-icon text-xs-center" target="_blank" href="https://www.gradescope.com/">Submit Files &uArr;</a></li>
+</ul>
+
+<h5 class="mt-5">Introduction</h5>
+      <p>In this assignment, you will add functionality to the code you wrote for <a href="../random/index.html">Assignment 1</a>, toward the goal of implementing a secure facility for client-server communication across the Internet.</p>
+      
+      <p>As before, we will give you some of the code you need, and we will ask you to provide certain functions missing from the code we provide.  As before, you must not use any cryptography libraries; the only cryptographic primitives you may use are the ones we gave you, and ones you implemented from scratch yourself.</p>
+      
+      <p>In this assignment you will implement three classes, by modifying three Java code files:</p>
+      <ol>
+	<li> You will modify  <code>RSAKeyPair.java</code> to implement RSA key-pair generation.</li>
+	<li> You will modify  <code>RSAKey.java</code> to implement secure RSA encryption and decryption, and to create and verify digital signatures.</li>
+	<li> You will modify  <code>KeyExchange.java</code> to implement secure key exchange.</li>
+      </ol>
+      <p>As in the previous assignment, we have provided you with code files in which some parts are <em>stubbed out</em>. You will replace the stubbed out pieces with code that actually works and provides the required security guarantee. We have put a comment saying <code>IMPLEMENT THIS</code> everywhere that you have to supply code.</p>
+      
+      <p>Your solution will build on the functionality that you implemented for Assignment 1, but we will test your solution with our own implementation of the Assignment 1 functionality. Your solution must work correctly when we do this — this shouldn’t be a problem as long as you respect the API boundaries between the different classes we have given you.  To help you mimic the testing setup that we will use, we are providing a pre-compiled JAR file (library) containing our reference solution to Assignment 1. We recommend that you use this instead of your own solution to Assignment 1.</p>
+
+            <h5 class="mt-5">Objectives</h5>
+            <ul>
+              <li>Understand how asymmetric cryptography works.</li>
+            </ul>
+      
+
+            <h5 class="mt-5">RSAKeyPair.java</h5>
+      <p>Your RSAKeyPair class should implement the following API:</p>
+      <code><pre>
+public class RSAKeyPair {
+   public RSAKeyPair(PRGen rand, int numBits)
+   public RSAKey getPublicKey()                 // already implemented
+   public RSAKey getPrivateKey()                // already implemented
+   public BigInteger[] getPrimes()
+}</pre></code>
+
+      <p>For <code>RSAKeyPair</code>, the bulk of the interesting work is performed by the constructor. This constructor should create an RSA key pair using the algorithm discussed in class. The constructor will use the <code>PRGen rand</code> argument to get bits from a pseudo-random generator. The <code>numBits</code> argument is the size in bits of each of the primes that will be used. The key pair should be stored as a pair of <code>RSAKey</code> objects (see next section for more information on <code>RSAKey</code>).</p>
+      
+      <p>The <code>getPrimes()</code> method helps with the grading process. Invoking <code>getPrimes()</code> should return the two primes that were used in key generation. The primes may be returned in either order in a <code>BigInteger</code> array of length 2. Note that in the real-world implementation, you would not need to have a method to return these primes. </p>
+
+
+
+            <h5 class="mt-5">RSAKey.java</h5>
+      <p>Your RSAKey class should implement the following API:</p>
+      <code><pre>
+public class RSAKey {
+   public RSAKey(BigInteger theExponent, BigInteger theModulus)
+   public BigInteger getExponent()
+   public BigInteger getModulus()
+   public byte[] encrypt(byte[] plaintext, PRGen prgen)
+   public byte[] decrypt(byte[] ciphertext)
+   public byte[] sign(byte[] message, PRGen prgen)
+   public boolean verifySignature(byte[] message, byte[] signature)
+   public int maxPlaintextLength()
+   public byte[] encodeOaep(byte[] input, PRGen prgen)
+   public byte[] decodeOaep(byte[] input)
+   public byte[] addPadding(byte[] input)
+   public byte[] removePadding(byte[] input)
+}</pre></code>
+
+      <p>The <code>RSAKey</code> class implements core RSA functions, namely encryption/decryption as well as signing/verification. Note that the <code>RSAKey</code> class is used for both public and private keys, even though some key/method combinations are unlikely to be used in practice. For example, it is unlikely that the <code>sign()</code> method of a public <code>RSAKey</code> would ever be used.</p>
+      <p>The <code>encrypt()</code> method should encrypt the plain text using optimal asymmetric encryption padding (OAEP) as discussed in class. It is not enough to simply compute modular exponentiation on the plain text. Your code for OAEP encoding and decoding should be in the provided <code>encodeOaep()</code> and <code>decodeOaep()</code> methods. Your other methods should call these utility methods to encode/decode when necessary. When decodeOaep() fails integrity checks, it should reveal this by returning null or throwing an exception. For full credit, don’t forget to pad the input to the OAEP algorithm if it is too short – this is necessary to guarantee security (otherwise the exponentiated message might be smaller than the modulus).</p>
+      <p>The <code>sign()</code> method should generate a signature (array of bytes) that can be verified by the <code>verifySignature()</code> method of the other RSAKey in the private/public RSAKey pair. In the <code>sign()</code> method, you should not include the message as part of the signature; assume that the verifier will already have access to this message. This assumption of access is reflected in the API for <code>verifySignature()</code>, which accepts the message as one of its arguments.</p>
+      <p>Note that the <code>encrypt()</code>, <code>sign()</code>, and <code>encodeOaep()</code> methods take a <code>PRGen</code> object as a parameter, in case the implementation wants to use bits from a pseudo-random generator. The <code>decrypt()</code> method should correctly decrypt the cipher text.</p>
+      <p>The <code>maxPlaintextLength()</code> method should return the largest \(\ell\) such that any plain text of size \(\ell\) bytes can be encrypted with this key and padding scheme. Your code must correctly operate on plain texts that are any size less than or equal to the size returned by <code>maxPlaintextLength()</code>.</p>
+      <p>The <code>addPadding()</code> and <code>removePadding()</code> methods are used to pad the input to the OAEP algorithm if it is too short. <em>You should not call these methods from within <code>encodeOAEP()</code> and <code>decodeOAEP().</code></em></p>
+
+            <h5 class="mt-5">KeyExchange.java</h5>
+      <p>Your KeyExchange class should implement the following API:</p>
+<code><pre>
+public class KeyExchange {
+   public static final int OUTPUT_SIZE_BYTES
+   public static final int OUTPUT_SIZE_BITS
+   public KeyExchange(PRGen rand, boolean iAmServer)
+   public byte[] prepareOutMessage()
+   public byte[] processInMessage(byte[] inMessage)
+}</pre></code>
+
+      <p>The constructor should prepare to do a key exchange. The <code>rand</code> argument is a secure pseudo-random generator that can be used by the implementation. Each exchange has two participants; one of them plays the client role and the other plays the server role. The <code>iAmServer</code> argument is true if and only if we are playing the server role in this exchange. In our automated testing, we will use the <code>iAmServer</code> boolean as a flag to indicate which object belongs to which role. You may not need to use the <code>iAmServer</code> argument in your implementation, but it may be helpful for debugging.</p>
+      <p>Once the <code>KeyExchange</code> object is created, two things have to happen for the key exchange process to be complete:</p>
+      <ul>
+	<li>Invoke the <code>prepareOutMessage</code> method on this object, and send the result to the other participant.</li>
+	<li>Receive the result of the other participant’s <code>prepareOutMessage</code>, and pass it in as the argument to a call on this object’s <code>processInMessage</code>.</li>
+      </ul>
+
+      <p>These two things can happen in either order, or even concurrently (e.g., in different threads). This
+	code must work correctly regardless of the order.</p>
+      <p>The call to <code>processInMessage</code> should behave as follows:
+	<ul>
+	    <li>If passed a null value, then throw a <code>NullPointerException</code>.   </li>
+	      <li>Otherwise, if passed a value that could not possibly have been generated by <code>prepareOutMessage</code>, then return <code>null</code>.</li>
+	        <li>Otherwise,return a <em>digest</em> (hash) value with length <code>OUTPUT_SIZE_BYTES</code> and the property described below.</li>
+		</ul>
+	<p>Your <code>KeyExchange</code> class must provide the following security guarantee: If the two participants end up with the same non-null digest value, then this digest value is not known to anyone else. This must be true even if adversaries can observe and modify the messages sent between the participants.</p>
+
+      <p>This code is <em>not</em> required to check whether the two participants end up with the same digest value; the code calling this must verify that property.</p>
+
+      <h5 class="mt-5">Getting Started</h5>
+      <ul>
+
+	<li>Start with <code>RSAKeyPair.java</code>. While it is true that it contains instances of <code>RSAKey</code>, the <code>RSAKeyPair</code> class does not use any of the methods that you will implement in <code>RSAKey</code>.</li>
+	<li>As in Assignment 1, the specification is deliberately vague regarding how you should accomplish each task. There is a significant design component to each problem.</li>
+	<li>Make sure to run your code with the <code>java -ea</code> flag, so that assertions are enabled.</li>
+	<li>Use <code>BigInteger</code>:
+	    <ul>
+	          <li>Since you will be doing math with very large integers, you will probably want to use the <a href="https://docs.oracle.com/javase/8/docs/api/java/math/BigInteger.html">java.math.BigInteger</a> library class for any such operations. This class provides myriad functions that you may find useful for this assignment, particularly as <code>BigInteger</code> was originally designed with RSA implementation in mind. (Using <code>BigInteger</code> doesn’t violate our rule against using external cryptographic primitives, because <code>BigInteger</code> provides basic mathematical functions, and not cryptography.)</li>
+		      <li>If you find yourself writing complex functions involving <code>BigIntegers</code> (e.g., manually testing primality, manually generating primes, manually finding the greatest common denominator of two numbers, manually finding \(d\) given \(p\), \(q\), and \(e\), etc.), you are doing way more work than you need to. Find the appropriate <code>BigInteger</code> method.</li>
+		          <li>Converting back and forth between <code>BigInteger</code> objects and <code>byte[]</code> arrays is a major hassle. It’s surprisingly hard to get this code right. We have provided code in the <code>HW2Util.java</code> file that can do this.</li>
+			      <li>For maximum elegance in <code>RSAKey</code>, your message should only be in <code>BigInteger</code> format for the purposes of exponentiating and modulusing. In other words, when you are applying OAEP, padding, unOAEP, etc., it is much easier to deal with your input in terms of <code>byte[]</code> arrays.</li>
+			        </ul>
+	    <li>Given public and private keys \((d, N)\) and \((e, N)\), we have that \(x = (x^{(de)}\ mod\ N)\), if \(0 < x < N\). Thus, if you are going to use the built-in <code>BigInteger</code> methods to encrypt and decrypt, it is important that you represent your input message as a positive <code>BigInteger</code>.</li>
+															       <li>An <code>RSAKey</code> object does not know if it is <em>private</em> or <em>public</em> key. Indeed, it is even possible to sign messages using a public key or encrypt using a private key, though neither of these strange operations are likely to be useful in practice.</li>
+															       <li>We recommend that first you get your code working for the case where all inputs are full sized, then modify your code so that it handles padding. When you implement padding, the relevant code should be in the provided <code>addPadding()</code> and <code>removePadding()</code> methods. Your other methods should call these utility methods to pad/unpad when necessary.</li>
+															       <li>If your are confident that your solution to Assignment 1 is correct, you could use those <code>.java</code> files for testing your implementation of Assignment 2. Alternatively, you can use our reference solution to  Assignment 1, which is provided a pre-compiled JAR file (library).   Note that this library does not contain source code. To compile and execute your Assignment 2 code using the JAR file, you need to include it in your classpath.  
+<br/>
+For example, using Linux/Mac command line, you may run:
+<code><pre>
+$ javac -cp hw1.jar KeyExchange.java
+$ java -cp hw1.jar:. KeyExchange
+</pre></code>
+For Windows command line, you may run:
+<code><pre>
+$ javac -cp "hw1.jar" KeyExchange.java
+$ java -cp "hw1.jar;." KeyExchange
+</pre></code>
+If you are testing and running using an IDE, please refer to the IDE's user manual on how to add <code>.jar </code> files to the classpath.
+      </li>
+															             
+
+															         </ol>
+  
+      </ul>
+
+      <h5 class="mt-5">Submission Checklist</h5>
+      <p>Submit your files to  <a href="https://www.gradescope.com/">Gradescope<a>:</p>
+      <ul style="list-style-type:none;">
+	<!--<li>&#9633; <code>README.txt</code> - Name and NetId</li>-->
+	<li>&#9633; <code>RSAKey.java</code> - Source code file containing your implementation of the <code>RSAKeyPair</code> class.</li>
+	<li>&#9633; <code>RSAKeyPair.java</code> - Source code file containing your implementation of the <code>RSAKey</code> class.<li>
+	  <li>&#9633; <code>KeyExchange.java</code> - Source code file containing your implementation of the <code>KeyExchange</code> class.</li>
+      </ul>  
+
+    </div>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+  </body>
+
+</html>
