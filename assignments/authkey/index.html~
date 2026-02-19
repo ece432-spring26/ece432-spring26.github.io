@@ -1,0 +1,156 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>COS 432/ECE 432 - Fall 2021</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="../../css/logo-nav.css" rel="stylesheet">
+
+    <!-- MatJax-->
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML' async></script>
+
+
+  </head>
+
+  <body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="../../index.html">
+          <img src="../../images/key.svg" width="60" height="60" alt=""> COS 432/ECE 432 - Fall 2021
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="../../index.html">Overview
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../../schedule.html">Schedule</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../../assignments.html">Assignments</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../../resources.html">Resources</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container-fluid">
+      <h5 class="mt-5">Assignment 3: Authenticated Key Exchange</h5>
+      <ul class="text-right list-inline">
+	<li class="list-inline-item"><a class="social-icon text-xs-center" target="_blank" href="cos432-authkey.zip">Download Files &dArr;</a></li>
+	<li class="list-inline-item"><a class="social-icon text-xs-center" target="_blank" href="https://www.gradescope.com/">Submit Files &uArr;</a></li>
+      </ul>
+
+      <h5 class="mt-5">Introduction</h5>
+      <p>In this assignment, you will add functionality to the code you wrote for Assignments 1 and 2, to reach the goal of implementing a secure facility for client-server communication across the Internet.</p>
+      
+      <p>As before, we will give you some of the code you need, and we will ask you to provide certain functions missing from the code we provide.  As before, you must not use any crypto libraries; the only primitives you may use are the ones we gave you, and ones you implemented from scratch yourself.  Your solution will build on the functionality that you implemented for Assignment 2, but we will test your solution with our own implementation of the Assignment 2 functionality. Your solution must work correctly when we do this — this shouldn’t be a problem as long as you respect the API boundaries between the different classes we have given you. To help you mimic the testing setup that we will use, we are providing a pre-compiled JAR file (library) containing our reference solution to Assignment 2. We recommend that you use this instead of your own solution to Assignment 2.
+
+
+      <p>In this assignment you will implement a secure channel abstraction that can be used by two programs, a client and a server, to communicate across a network, with the confidentiality and integrity of messages guaranteed. We have given you a class <code>InsecureChannel</code> that implements a channel that works but is not secure: everything is sent in unprotected cleartext. We have also given you stubbed-out code for the <code>SecureChannel</code> class that extends <code>InsecureChannel</code> and (once you have modified it) will protect security and confidentiality.<p>
+	
+      <p>To facilitate the testing process, we have provided the following files:<p>
+	<ul>
+	    <li><code>Util432s.java</code> - provides a few methods used by the other testing files (feel free to use these methods for debugging).</li>
+	      <li><code>ChannelTest.java</code> - provides a demonstration that the <code>InsecureChannel</code> class works correctly</li>
+	        <li><code>SecureChannelTest.java</code> -  used to test your <code>SecureChannel</code> class (once implemented). Note that this class does NOT test security properties, instead testing only basic functionality. Also, note the commented out lines that give an example of how you can use <code>Util432s</code> for debugging.</li>
+		  <li><code>InsecureChannel.java.debug</code> - provides a special version of <code>InsecureChannel</code> and provides the ability to echo channel transmissions to the screen. To use this class, simply rename the file <code>InsecureChannel.java</code> and place it in the same directory as <code>SecureChannel.java</code>.</li>
+		  </ul>
+      
+      <h5 class="mt-5">AuthEncryptor.java</h5>
+      <p>Your <code>AuthEncryptor</code>  class should implement the following API:</p>
+      <code><pre>
+public class AuthEncryptor {
+   public AuthEncryptor(byte[] key)
+   public byte[] authEncrypt(byte[] in, byte[] nonce, boolean includeNonce)
+}</pre></code>
+
+      <p>This class is used to perform authenticated encryption on values. Authenticated encryption protects the confidentiality of a value, so that the only way to recover the initial value is to decrypt the value using the same <code>key</code> and <code>nonce</code> that was used to encrypt it. At the same time, authenticated encryption protects the integrity of a value, so that a party possessing the same <code>key</code> and <code>nonce</code> (that were used to authenticate it) can verify that nobody has tampered with the value.</p>
+      <p>Code that uses <code>AuthEncryptor</code> will be required to pass in a different <code>nonce</code> for every call to the <code>authEncrypt</code> method. The <code>AuthEncryptor</code> class is not required to detect violations of this rule; it is the responsibility of the code that uses <code>AuthEncryptor</code> to avoid re-using a <code>nonce</code> with the same <code>AuthEncryptor</code> instance.</p>
+      If <code>includeNonce</code> is true, then the <code>nonce</code> should be included (in plaintext form) in the output of <code>authEncrypt</code>. If <code>includeNonce</code> is false, then the <code>nonce</code> should still be used in calculating the output, but the <code>nonce</code> itself should not be copied into the output. (Presumably the party who will decrypt the message already knows what the <code>nonce</code> will be.)</p>
+
+
+      
+      <h5 class="mt-5">AuthDecryptor.java</h5>
+      <p>Your <code>AuthDecryptor</code>  class should implement the following API:</p>
+      <code><pre>
+public class AuthDecryptor {
+   public AuthDecryptor(byte[] key)
+   public byte[] authDecrypt(byte[] in)
+   public byte[] authDecrypt(byte[] in, byte[] nonce)
+}</pre></code>
+
+      <p>The value passed as <code>in</code> will normally have been created by calling <code>authEncrypt()</code> with the same <code>nonce</code> in an <code>AuthEncryptor</code> that was initialized with the same key as this <code>AuthDecryptor</code>.<p>
+	If the integrity of the input value cannot be verified (that is, if the input value could not have been created by calling <code>authEncrypt()</code> with the same <code>nonce</code> in an <code>AuthEncryptor</code> that was initialized with the same key as this <code>AuthDecryptor</code>), then this method returns <code>null</code>. Otherwise it returns a newly allocated byte-array containing the plaintext value that was originally passed to <code>authEncrypt()</code>.</p>
+      <p>If the <code>nonce</code> is included in the message, then the message should be processed with the <code>authDecrypt(byte[] in)</code> method. Otherwise, the <code>nonce</code> should be provided along with the ciphertext to <code>authDecrypt(byte[] in, byte[] nonce)</code>.</p>
+
+      <h5 class="mt-5">SecureChannel</h5>
+      <p>Your <code>SecureChannel</code>  class should implement the following API:</p>
+      <code><pre>
+public class SecureChannel extends InsecureChannel {
+   public SecureChannel(InputStream inStr, OutputStream outStr,
+                        PRGen rand, boolean iAmServer,
+                        RSAKey serverKey) throws IOException
+   public void sendMessage(byte[] message) throws IOException
+   public byte[] receiveMessage() throws IOException
+}</pre></code>
+
+      <p>The constructor will contain the vast majority of your code. Its role is to set up the secure channel such that the <code>sendMessage</code> and <code>receiveMessage</code> methods can do their jobs. These methods should provide authenticated encryption for the messages that pass over the channel, ensuring that messages arrive at the receiving end in the same order that they were send on the sending end. Furthermore, when the client is setting up its channel, it should also authenticate the server’s identity, and should take whatever steps are necessary to detect any man-in-the-middle. If one of the two parties (server or client) detects a potential security problem during channel construction, that party should close the channel by calling <code>close()</code>.  To ensure foward secrecy, the <code>close()</code> method must delete any secret values associated with the channel.  You can assume the <code>serverKey</code> (public key) passed to the constructor of <code>SecureChannel</code> on the client side of the communication is verified externally in some way (for example via a trusted certificate).</p>
+      <p>The underlying <code>InsecureChannel</code> will normally deliver messages in the same order they were sent. But note that an adversary might try to reorder messages. The <code>receiveMessage</code> method should return <code>null</code> if an invalid or out-of-order message shows up.</p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+
+
+      <h5 class="mt-5">Getting Started</h5>
+      <ul>
+	<li>Start by looking at <code>ChannelTest.java</code>, which will provide you with a better understanding of how <code>InsecureChannel</code> (and <code>SecureChannel</code>) are intended to be used. In particular, two instances of <code>InsecureChannel</code> will be created (one for the server &rarr; client channel and one for the client &rarr; server channel), each of which connects up two data streams (one input and one output data stream). Messages are sent through the channel using the <code>sendMessage()</code> method, and whenever a message is sent via a channel, it stays there until a corresponding <code>receiveMessage()</code> call is made. Luckily for you, you will not need to think about <code>InputStreams</code> or <code>OutputStreams</code> at all. That is all taken of in <code>InsecureChannel.java</code> and in the main function of the <code>ChannelTests</code>.</li>
+	<li> If you are unfamiliar with <code>InputStreams</code> and <code>OutputStreams</code>, don’t worry, you won’t be dealing with them very closely. The same goes for runnable classes and threads.</li>
+	<li>Another thing you might try is copying <code>InsecureChannel.java.debug</code> over <code>InsecureChannel.java</code> and running <code>ChannelTest</code>, which will let you see the raw traffic being sent over the channel.</li>
+	<li>From there, look at <code>SecureChannelTest.java</code> to get a feeling for how the <code>SecureChannel</code> instantiations differ.</li>
+	<li>From here, you should design a threat model. Carefully consider everything that your adversary is trying to do that you would like to prevent. Place this threat model and mitigations in your <code>Report.txt</code> file. This report should succinctly demonstrate that you have considered both the threats against your implementation and the specific techniques you use to defend against them. One way to format this is to describe a threat in a sentence or two, followed by a sentence or two that explains how your implementation defends against it; repeating this format for each threat.</li>
+	<li>Once you feel comfortable with your threat model, consider what tools you have available from Assignments 1 and 2. Your design should be <em>modular</em>, where specific classes solve specific subtasks. Sketch everything out schematically and try to find ways to compromise the security of your design. Perhaps the best way to do this is to start your design early, sleep on it, and then come back later to analyze it from a perspective that has been freshened by sleep.</li>
+	<li>Once you feel comfortable with your overall design, implement and test.</li>
+	<li>In <code>SecureChannelTest</code>, if a thread calls <code>readMessage</code> and there is no message available, it will wait until a message becomes available.</li>
+      </ul>
+      
+      <h5 class="mt-5">Submission Checklist</h5>
+      <p>Submit your files to the <a href="https://www.gradescope.com/">Gradescope<a>:</p>
+      <ul style="list-style-type:none;">
+	<li>&#9633; <code>Report.txt</code> Threat model and Mitigation Description (see Getting Started for requirements).</li>
+	<li>&#9633; <code>AuthEncryptor.java</code> - Source code file containing your implementation of the <code>AuthEncryptor</code> class.</li>
+	<li>&#9633; <code>AuthDecryptor.java</code> - Source code file containing your implementation of the <code>AuthDecryptor</code> class.<li>
+	  <li>&#9633; <code>SecureChannel.java</code> - Source code file containing your implementation of the <code>SecureChannel</code> class.</li>
+      </ul>  
+      
+    </div>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+  </body>
+
+</html>
