@@ -1,0 +1,381 @@
+
+<!DOCTYPE html>
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>COS 432/ECE 432 - Fall 2021</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="../../css/logo-nav.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="../../index.html">
+          <img src="../../images/key.svg" width="60" height="60" alt=""> COS 432/ECE 432 - Fall 2021
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="../../index.html">Overview
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../../schedule.html">Schedule</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../../assignments.html">Assignments</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="../../resources.html">Resources</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container-fluid">
+        <h5 class="mt-5">Assignment 4: Network Security (Group Assignment)</h5>
+        <ul class="text-right list-inline">
+            <li class="list-inline-item">
+                <a class="social-icon text-xs-center" target="_blank" href="cos432-netsec.zip">
+                    Download Files ⇓
+                </a>
+            </li>
+            <li class="list-inline-item">
+                <a class="social-icon text-xs-center" href="https://www.gradescope.com/">
+                    Submit Files ⇑
+                </a>
+            </li>
+        </ul>
+
+        <h5 class="mt-5">Introduction</h5>
+
+        <p>
+            This project will introduce you to common network protocols, to network packet trace analysis, and to the
+            basics of network penetration testing. This is a group assignment and must be done in groups of 2 or 3
+            only.
+        </p>
+
+        <p></p>
+
+        <h5 class="mt-5">Objectives</h5>
+        <ul>
+            <li> Gain exposure to core network protocols and concepts.</li>
+            <li> Learn to apply manual and automated traffic analysis to detect security problems.</li>
+            <li> Understand offensive techniques used to attack local network traffic.</li>
+            <li> Practice network penetration testing.</li>
+        </ul>
+
+        <h5 class="mt-5">Read this First</h5>
+        <p>
+            This project asks you to perform attacks, with our permission, against a target network that we are
+            providing for this purpose. Attempting the same kinds of attacks against other networks without
+            authorization is prohibited by law and university policies. You must not attack any network without
+            authorization! Per course policy, you are required to respect the privacy and property rights of others at
+            all times. See <a href="https://rrr.princeton.edu/">“Right, Rules, and Responsibilities”</a> on the
+            Princeton University website for more details. This includes observing the work of other groups if visible
+            on shared networks or machines.
+        </p>
+        <p>
+            Additionally, please understand and honor the specific actions that are OUT OF SCOPE for Part 3 of the
+            assignment at the end of that section.
+        </p>
+
+        <h5 class="mt-5">Getting Started</h5>
+
+        <p>
+            Please follow the <a href="vm_instructions.pdf">VM instructions</a> to set up the Virtual Machine
+            environment needed for this project. Once the setup is complete and you are able to log in to the COS432
+            VM, download the <a href="cos432-netsec.zip">starter zip</a> to the VM, then proceed to the following
+            parts. You will be answering questions in the text files found in that starter zip archive.
+        </p>
+
+        <h5 class="mt-5">Part 1. Exploring Network Traces</h5>
+        <p>
+            Security analysts and attackers both frequently study network traffic to search for vulnerabilities and to
+            characterize network behavior. In this section, you will examine a network packet trace (commonly called a
+            “pcap”, for “packet capture”) that we recorded on a sample network we set up for this assignment. You will
+            search for specific vulnerable behaviors and extract relevant details using the Wireshark network analyzer,
+            which is available in the provided VM image, or at
+            <a href="https://www.wireshark.org/">https://www.wireshark.org</a>.
+        </p>
+
+        <p>
+            Examine the <code>part1.pcap</code> file from the zip file that you downloaded. Familiarize yourself with
+            Wireshark’s features. Try exploring the various options for filtering and for reconstructing data streams.
+        </p>
+
+        <p>
+            Concisely answer the questions below. Each response should require at most two to three sentences. Use the
+            provided <code>part1.txt</code> file.
+        </p>
+
+        <ol>
+            <li><p>
+                Multiple devices are connected to the local network. What are their MAC and IP addresses? Who
+                manufactured these devices?
+            </p></li>
+            <li><p>
+                What type of network does this appear to be (e.g., a large corporation, an ISP backbone, etc.)? Point
+                to evidence from the trace that supports this.
+            </p></li>
+            <li><p>One of the clients connects to an FTP server during the trace.</p>
+                <ol type="a">
+                    <li><p>What is the DNS hostname of the server it connects to?</p></li>
+                    <li><p>Is the connection using Active or Passive FTP?</p></li>
+                    <li><p>Based on the packet capture, what is one major vulnerability of the FTP protocol?</p></li>
+                    <li><p>
+                        Name at least two network protocols that can be used in place of FTP to provide secure file
+                        transfer.
+                    </p></li>
+                </ol>
+            </li>
+            <li>
+                <p>
+                    The trace shows that at least one of the clients makes HTTPS connections to sites other than
+                    Facebook. Pick one of these connections and answer the following:
+                </p>
+                <ol type="a">
+                    <li><p>What is the domain name of the site the client is connecting to?</p></li>
+                    <li><p>
+                        Is there any way the HTTPS server can protect against the leak of information in (a)?
+                    </p></li>
+                    <li><p>
+                        During the TLS handshake, the client provides a list of supported cipher suites. List the
+                        first three cipher suites and name the crypto algorithms used in each.
+                    </p></li>
+                    <li><p>
+                        Are any of these cipher suites worrisome from a security or privacy perspective? Why?
+                    </p></li>
+                    <li><p>What cipher suite does the server choose for the connection?</p></li>
+                </ol>
+            </li>
+            <li><p>One of the clients makes a number of requests to Facebook.</p>
+                <ol type="a">
+                    <li><p>
+                        Even though logins are processed over HTTPS, what is insecure about the way the browser is
+                        authenticated to Facebook?
+                    </p></li>
+                    <li><p>How would this let an attacker impersonate the user on Facebook?</p></li>
+                    <li><p>How can users protect themselves against this type of attack?</p></li>
+                    <li><p>What did the user do while on the Facebook site?</p></li>
+                </ol>
+            </li>
+        </ol>
+
+        <h5 class="mt-5">Part 2. Anomaly Detection</h5>
+        <p>
+            In Part 1, you manually explored a network trace. Now, you will programmatically analyze a pcap file to
+            detect suspicious behavior. Specifically, you will be attempting to identify port scanning.
+        </p>
+
+        <p>
+            Port scanning is a technique used to find network hosts that have services listening on one or more target
+            ports. It can be used offensively to locate vulnerable systems in preparation for an attack, or
+            defensively for research or network administration. In one kind of port scan technique, known as a
+            <code>SYN</code> scan, the scanner sends TCP <code>SYN</code> packets (the first packet in the TCP
+            handshake) and watches for hosts that respond with <code>SYN+ACK</code> packets (the second handshake
+            step). Since most hosts are not prepared to receive connections on any given port, typically, during a
+            port scan, a much smaller number of hosts will respond with <code>SYN+ACK</code> packets than originally
+            received <code>SYN</code> packets. By observing this effect in a packet trace, you can identify source
+            addresses that may be attempting a port scan.
+        </p>
+
+        <p>
+            Your task is to develop a Python program that analyzes a pcap file in order to detect possible
+            <code>SYN</code> scans. To do this, you will use <code>dpkt</code>, a library for packet manipulation and
+            dissection. It is available in most package repositories. You can find more information about
+            <code>dpkt</code> at <a href="https://github.com/~kbandla/dpkt">https://github.com/~kbandla/dpkt</a> and
+            view documentation by running <code>pydoc dpkt</code>, <code>pydoc dpkt.ip</code>, etc.; there's also a
+            helpful tutorial here:
+            <a href="https://jon.oberheide.org/blog/2008/10/15/dpkt-tutorial-2-parsing-a-pcap-file">
+                https://jon.oberheide.org/blog/2008/10/15/dpkt-tutorial-2-parsing-a-pcap-file
+            </a>
+        </p>
+
+        <p>Your program will take the path of the pcap file to be analyzed as a command-line parameter, e.g.:</p>
+        <p style="margin-left: 40px"><code>python detector.py capture.pcap</code></p>
+
+        <p>
+            The output should be the set of IP addresses (one per line) that sent more than three times as many
+            <code>SYN</code> packets as the number of <code>SYN+ACK</code> packets they received. Your program should
+            <strong>silently ignore</strong> packets that are malformed or that are
+            <strong>not using Ethernet, IP, and TCP</strong>.
+        </p>
+        <p>
+            A large (~350MB) sample pcap file captured from a real network is included in the starter zip as
+            <code>part2.pcap</code>.
+        </p>
+
+        <p>
+            You can examine the packets manually by opening this file in Wireshark. For this input, your program’s
+            output should be these lines, in any order:
+        </p>
+        <code><pre>128.3.23.2
+128.3.23.5
+128.3.23.117
+128.3.23.158
+128.3.164.248
+128.3.164.249</pre></code>
+
+        <p>
+            Although the above instructions are for a Python program, you are welcome to use any programming language
+            of your choice. Simply make a private Ed Discussions post if your group is planning to use a different programming
+            language and wait for a confirmation from the AIs (we'd like to make sure we're equipped to evaluate and
+            grade your code). In this post, please also specify the library you plan on using. Kindly note that
+            support might be limited for languages other than Python.
+        </p>
+
+        <h5 class="mt-5">Part 3. Penetration Testing</h5>
+        <p>
+            The fictional company SketchyCorp has contracted with COS 432 to provide penetration testing services to
+            it. Each project team will conduct a thorough penetration test of the company's networks and exposed systems.
+        </p>
+        <p>
+            SketchyCorp recently set up a remote office for its employees to work in. SketchyCorp is concerned that
+            its remote office may be more vulnerable than its headquarters since it uses a wireless network to provide
+            access to its remote employees.
+        </p>
+
+        <p>
+            Your objective is to test the security of SketchyCorp’s networks and systems. In this engagement you will
+            be authorized to break in to SketchyCorp’s systems and explore any vulnerabilities you find, subject to
+            the Rules of Engagement below. As in a real-world penetration test, you will be expected to use your
+            ingenuity and technical skills to discover clues and techniques for meeting your objectives.
+        </p>
+
+        <p>
+            SketchyCorp employees connect to the wireless network using WPA2-PSK security. From there, they can access
+            the SketchyCorp firewall, which allows company employees to log in and gain access to company mainframe.
+        </p>
+
+        <p>The investigators believe the infrastructure works as shown in Figure 1.</p>
+        <figure align="center">
+            <img src="figure.png" style="width:75%">
+            <figcaption> Figure 1: Infrastructure overview of SketchyCorp. </figcaption>
+        </figure>
+        <p>
+            We have sent investigators to the remote office to attempt to capture WiFi traffic. However, they have
+            been foiled by WPA2-PSK security used by the WiFi network. They have managed to find a capture of the WiFi
+            authentication handshake which can be found as <code>part3.pcap</code> in the zip file. They have also
+            managed to determine the password is in the form of either cos432-XYZ or COS432-XYZ where X,Y,Z are
+            alphanumeric characters [a-z,A-Z,0-9]. Provide them with the WiFi password at
+            <a href="https://www.sketchycorpwifi.net/netsec">https://www.sketchycorpwifi.net/netsec</a> and they will provide you with your
+            next lead.
+        </p>
+
+        <p>
+            Concisely answer the questions below. Each response should require at most two to three sentences. Use the
+            provided <code>part3.txt</code> file.
+        </p>
+        <ol>
+            <li><p>How many possible Wi-Fi passwords are there that fulfills the password format?</p></li>
+            <li><p>What is that actual Wi-Fi password used? How did you obtain that password?</p></li>
+            <li><p>
+                There are three machines in the network, namely the employee, the firewall, and the mainframe.
+            </p></li>
+            <ol type="a">
+                <li><p>
+                    What are their IP addresses, respectively? (If a machine has multiple interfaces, report all IP
+                    addresses.) How did you get these addresses?
+                </p></li>
+                <li><p>
+                    What services are currently running on these machines respectively? On which port is each service
+                    running? How did you obtain this information?
+                </p></li>
+            </ol>
+            <li><p>There are unencrypted and encrypted conversations between Alice and Bob.</p></li>
+            <ol type="a">
+                <li><p>
+                    What does the unencrypted conversation say? Please paste it here and briefly describe how you
+                    found and obtained the content.
+                </p></li>
+                <li><p>
+                    (extra credit) Can you decrypt the encrypted messages? If so, what does the plaintext say?
+                    Describe how you determined the plaintext contents of the encrypted messages.
+                </p></li>
+            </ol>
+            <li><p>
+                List all of the clients of the company. Briefly explain how you gained access to this client list.
+            </p></li>
+        </ol>
+
+        <p>
+            There will be certain systems and networks that are <i>in scope</i> for this project. Everything else
+            should be considered <i>out of scope</i>. If you have any questions about what is in or out of scope for
+            this project, get clarification from one of the course AIs before you act.
+        </p>
+
+        <p>Things that are in scope:</p>
+        <ul>
+            <li><p>Connecting to the SketchyCorp network.</p></li>
+            <li><p>Capturing network traffic from the SketchyCorp firewall</p></li>
+            <li><p>Using automated network scanning tools from the SketchyCorp firewall.</p></li>
+            <li><p>Connecting to any servers accessible from SketchyCorp firewall.</p></li>
+            <li><p>Logging in to SketchyCorp systems with any credentials you obtain.</p></li>
+            <li><p>Brute forcing or cracking SketchyCorp passwords with your local machine.</p></li>
+        </ul>
+
+        <p>Here are a few guidlines to avoid going OUT OF SCOPE during this project:</p>
+        <ul>
+            <li><p>
+                DO NOT brute force any passwords if it means sending large amounts of traffic over a network
+                connection.
+            </p></li>
+            <li><p>
+                DO NOT capture traffic on your local machine with Wireshark or tcpdump. Additionally, NMap may not be
+                run on your local machine at all. You may only use Wireshark on your local machine to review packet
+                capture files.
+            </p></li>
+            <li><p>
+                DO NOT perform actions that cause difficulty for other users or that interfere with the project
+                infrastructure (i.e., denial of service).
+            </p></li>
+            <li><p>DO NOT attempt to elevate your shell privileges on the SketchyCorp firewall.</p></li>
+            <li><p>
+                DO NOT do anything else that’s not specifically designated as in scope. If you’re unsure, please ask
+                for clarification on Ed Discussions.</p></li>
+        </ul>
+        <br>
+
+        <p>
+            <b>A note about cheating:</b> There may be backdoors you discover along the way. DO NOT SHARE THEM. If you
+            have questions about whether you may use a particular backdoor, post a private question on Ed Discussions
+            <i>before</i> using it.
+        </p>
+
+        <h5 class="mt-5">Submission Checklist</h5>
+        <a name="submission"></a>
+        <ul style="list-style-type:none;">
+            <li>□ <code>part1.txt</code> - Answers to questions regarding Part 1.</li>
+            <li>
+                □ <code>detector.py</code> - The source code for your Python script (or another language) for
+                <code>SYN</code> scan detection.
+            </li>
+            <li>□ <code>part3.txt</code> - Answers to questions regarding Part 3.</li>
+        </ul>
+
+    </div>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+
+</body>
+</html>
