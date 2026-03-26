@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>COS 432/ECE 432 - Spring 2026</title>
+
+  <!-- Bootstrap core CSS -->
+  <link href="../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Custom styles for this template -->
+  <link href="../../css/logo-nav.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container">
+      <a class="navbar-brand" href="../../index.html">
+        <img src="../../images/key.svg" width="60" height="60" alt=""> COS 432/ECE 432 - Spring 2026
+      </a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive"
+        aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarResponsive">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="../../index.html">Overview
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="../../schedule.html">Schedule</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="../../assignments.html">Assignments</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="../../resources.html">Resources</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Page Content -->
+  <div class="container-fluid">
+    <h5 class="mt-5">Assignment 5: Web Security (Group Assignment)</h5>
+    <ul class="text-right list-inline">
+      <li class="list-inline-item"><a class="social-icon text-xs-center" target="_blank"
+          href="cos432-websec.zip">Download Files &dArr;</a></li>
+      <li class="list-inline-item"><a class="social-icon text-xs-center" target="_blank"
+          href="https://www.gradescope.com">Submit Files &uArr;</a></li>
+    </ul>
+
+    <h5 class="mt-5">Introduction</h5>
+    <p>In this assignment, we provide an insecure website, and your job is to attack it by exploiting three common
+      classes of vulnerabilities: SQL injection, cross-site request forgery (CSRF), and cross-site scripting (XSS). You
+      are also asked to exploit these problems with various flawed defenses in place. Understanding how these attacks
+      work will help you better defend your own web applications.</p>
+
+    <p> This is a group assignment, and must be done in groups of 2 only.</p>
+
+    <h5 class="mt-5">Objectives</h5>
+    <ul>
+      <li>Learn to spot common vulnerabilities in websites and to avoid them in your own projects.</li>
+      <li>Understand the risks these problems pose and the weaknesses of naive defenses.</li>
+      <li>Gain experience with web architecture and with HTML, JavaScript, and SQL programming.</li>
+    </ul>
+
+
+    <h5 class="mt-5">Read This First</h5>
+    <p>
+      This project asks you to perform attacks, with our permission, against a target website that we are
+      providing for this purpose. Attempting the same kinds of attacks against other websites without
+      authorization is prohibited by law and university policies. You must not attack any website without authorization!
+      Per course policy, you are
+      required to respect the privacy and property rights of others at all times. See <a
+        href="https://rrr.princeton.edu/">“Right, Rules, and Responsibilities”</a> on the Princeton University website
+      for more
+      details.
+    </p>
+    <h5></h5>
+    <h5 class="mt-5">Target Website</h5>
+    <p>A startup named <b>BUNGLE!</b> is about to launch its first product — a web search engine — but their investors
+      are nervous about security problems. Unlike the Bunglers who developed the site, you took COS 432, so the
+      investors have hired you to perform a security evaluation before it goes live.</p>
+
+    <p><b>BUNGLE!</b> is available for you to test at <a href="https://elecos432.org">https://elecos432.org</a>.</p>
+
+    <p>The site is written in Python using the <a href="https://bottlepy.org/">Bottle web framework</a>. Although Bottle
+      has built-in mechanisms that help guard against some common vulnerabilities, the Bunglers have circumvented or
+      ignored these mechanisms in several places.</p>
+
+    <p>In addition to providing search results, the site accepts logins and tracks users’ search histories. It stores
+      usernames, passwords, and search history in a MySQL database. Before being granted access to the source code, you
+      reverse engineered the site and determined that it replies to five main URLs:
+    <ul style="list-style: none; ">
+      <li><code>/</code></li>
+      <li><code>/search</code></li>
+      <li><code>/login</code></li>
+      <li><code>/logout</code></li>
+      <li><code>/create</code></li>
+    </ul>
+    The function of these URLs is explained below, but if you want an additional challenge, you can skip the rest of
+    this section and do the reverse engineering yourself.</p>
+    <p>
+    <ul style="list-style: none; ">
+      <li><b>Main page</b> (<code>/</code>) The main page accepts <code>GET</code> requests and displays a search form.
+        When submitted,this form issues a <code>GET</code> request to <code>/search</code>, sending the search string as
+        the parameter “q”.
+        <br>If no user is logged in, the main page also displays a form that gives the user the option of logging in or
+        creating an account. The form issues <code>POST</code> requests to /login and /create.
+      </li>
+      <p></p>
+      <li><b>Search results</b> (<code>/search</code>) The search results page accepts GET requests and prints the
+        search string, supplied in the “q” query parameter, along with the search results. If the user is logged in, the
+        page also displays the user’s recent search history in a sidebar.
+        <br>
+        Note: Since actual search is not relevant to this project, you might not receive any results.
+      </li>
+      <p></p>
+
+      <li><b>Login handler</b> (<code>/login</code>) The login handler accepts <code>POST</code> requests and takes
+        plaintext “username” and “password” query parameters. It checks the user database to see if a user with those
+        credentials exists. If so, it sets a login cookie and redirects the browser to the main page. The cookie tracks
+        which user is logged in; manipulating or forging it is not part of this project.
+      </li>
+      <p></p>
+      <li><b>Logout handler</b> (<code>/logout</code>) The logout handler accepts <code>POST</code> requests. It deletes
+        the login cookie,if set, and redirects the browser to the main page.
+      </li>
+      <p></p>
+      <li><b>Create account handler</b> (<code>/create</code>) The create account handler accepts <code>POST</code>
+        requests and receives plaintext “username” and “password” query parameters. It inserts the username and password
+        into the database of users, unless a user with that username already exists. It then logs the user in and
+        redirects the browser to the main page.
+        <br></br>
+        Note: The password is neither sent nor stored securely; however, none of the attacks you implement should depend
+        on this behavior. You should choose a username and password that other groups will not guess, but never use an
+        important password to test an insecure site (in general, you shouldn't reuse any passwords)!
+      </li>
+    </ul>
+    <h5 class="mt-5">Guidelines</h5>
+    <p>
+      <b>Virtual Machine:</b> For this project, we’d like you to do all your testing within the VM that you used for
+      Assignment 4. This VM provides Firefox (the browser we will use for grading is the same version) and a method for
+      hosting a local HTTP server (necessary for Part 3). Browser versions have slight variations in their behavior that
+      may affect your XSS and CSRF attacks, so we highly recommend that you develop and test your solutions within the
+      VM.
+    </p>
+    <p>
+      <b>Firefox Configuration:</b> Firefox implements <a href=https://developer.mozilla.org/en-US/docs/Web/Privacy/State_Partitioning>
+      dynamic state partitioning</a> which makes pulling off CSRF (part 2) considerably difficult.
+      In order to make things feasible, while grading, we will use Firefox 111.0.1 running on Ubuntu 20.04 and
+      set the <i>network.cookie.cookieBehavior</i> config variable to 4 (Only reject trackers), all other variables and settings
+      will be at their default values. When using the VM, you will find that Firefox automatically updates to the latest version.
+      That is ok and you should be able to work on the assignment as expected if you set the  <i>network.cookie.cookieBehavior</i>
+      config variable. To do so, please follow these instructions on <a href=https://support.mozilla.org/en-US/kb/about-config-editor-firefox>
+      editing config variables</a>.
+      Note that this change will not affect your solutions to parts 1 and 3.
+    </p>
+    <p>
+      <b>Defense Levels:</b> The Bunglers have been experimenting with some naïve defenses, so you also need to
+      demonstrate that these provide insufficient protection. In Parts 2 and 3, the site includes drop-down menus at the
+      top of each page that let you change the CSRF and XSS defenses that are in use. The solutions you submit must
+      override these selections by including the <code>csrfdefense=n</code> or <code>xssdefense=n</code> parameter in
+      the target URL, as specified in each task below. <b>You may not attempt to subvert the mechanism for changing the
+        level of defense in your attacks.</b> Be sure to test your solutions with the appropriate defense levels!
+    </p>
+
+    <p>In all parts, you should implement the simplest attack you can think of that defeats the given set of defenses.
+      In other words, do not simply attack the highest level of defense and submit that attack as your solution for all
+      defenses. You do not need to combine the vulnerabilities, unless explicitly stated.
+    </p>
+
+
+    <p>
+      <b>Resources:</b> The Firefox web developer tools will be very helpful for this project, particularly the
+      JavaScript console and debugger, DOM inspector, and network monitor. To open these tools, click the Developer
+      button in the Firefox menu. See <a
+        href="https://developer.mozilla.org/en-US/docs/Tools">https://developer.mozilla.org/en-US/docs/Tools</a>. Note
+      that there is also a special version of the browser called Firefox Developer Edition; you’re welcome to use it to
+      develop and test, but we will be grading with the normal edition of Firefox.
+    </p>
+    <p>
+      Your solutions will involve manipulating SQL statements and writing web code using HTML, JavaScript, and the
+      jQuery library. You should search the web for answers to basic how-to questions. There are many fine online
+      resources for learning these tools. Here are a few that we recommend:</p>
+
+    <ul>
+      <li><a href="http://sqlzoo.net/wiki/SQL_Tutorial">SQL Tutorial </a></li>
+      <li><a href="https://dev.mysql.com/doc/refman/5.7/en/sql-statements.html">SQL Statement Syntax </a></li>
+      <li><a href="https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Introduction">Introduction to HTML </a></li>
+      <li><a href="https://hsablonniere.github.io/markleft/prezas/javascript-101.html#1.0">JavaScript 101 </a></li>
+      <li><a href="https://learn.jquery.com/using-jquery-core">Using jQuery Core </a></li>
+      <li><a href="https://api.jquery.com">jQuery API Reference </a></li>
+      <li><a href="http://www.jmarshall.com/easy">HTTP Made Really Easy</a></li>
+    </ul>
+
+    <p>To learn more about SQL Injection, XSS, and CSRF attacks, and for tips on exploiting them, see:</p>
+    <ul>
+      <li><a href="https://www.owasp.org/index.php/SQL_Injection_Prevention_Cheat_Sheet">SQL Injection Prevention Cheat
+          Sheet</a></li>
+      <li><a href="https://www.owasp.org/index.php/Cross-Site_Request_Forgery_(CSRF)_Prevention_Cheat_Sheet">Cross-Site
+          Request Forgery (CSRF) Prevention Cheat Sheet</a></li>
+      <li><a href="https://www.owasp.org/index.php/XSS_(Cross_Site_Scripting)_Prevention_Cheat_Sheet">XSS (Cross Site
+          Scripting) Prevention Cheat Sheet</a></li>
+      <li><a href="https://www.owasp.org/index.php/XSS_Filter_Evasion_Cheat_Sheet">XSS Filter Evasion Cheat Sheet</a>
+      </li>
+    </ul>
+
+    <h5 class="mt-5">Getting Started</h5>
+    <p> Download the directory template <a href="cos432-websec.zip">here</a>. You should be using this to organize your
+      answers. For most of the questions, you can simply type up the answer in the text/html files we've created for
+      you. However, for 1.2, make sure you replace the placeholder zip archive with your own zip file that contains all
+      the source code.</p>
+
+    <h5 class="mt-5">Part 1. SQL Injection</h5>
+    <p>
+      Your first goal is to demonstrate SQL injection attacks that log you in as an arbitrary user without knowing the
+      password. In order to protect other students’ accounts, we’ve made a series of separate login forms for you to
+      attack that aren’t part of the main <b>BUNGLE!</b> site. For each of the following defenses, provide inputs to the
+      target login form that successfully log you in as the user “victim”:
+    </p>
+    <ol start="0">
+      <li><b>No defenses</b>
+        <br>
+        Target: <a href="https://elecos432.org/sqlinject0/">https://elecos432.org/sqlinject0/</a>
+        <br>
+        Submit: sql_0.txt
+      </li>
+      <p></p>
+      <li><b>Simple escaping</b>
+        <br>
+        The server escapes single quotes (') in the inputs by replacing them with two single quotes.
+        <br>
+        Target: <a href="https://elecos432.org/sqlinject1/">https://elecos432.org/sqlinject1/</a>
+        <br>
+        Submit: sql_1.txt
+      </li>
+      <p></p>
+      <li><b>Escaping and Hashing</b>
+        <br>
+        The server uses the following PHP code, which escapes the username and applies the MD5 hash function to the
+        password:
+        <code><pre>
+	        if (isset($_POST['username']) and isset($_POST['password'])) {
+               $username = mysql_real_escape_string($_POST['username']);
+               $password = md5($_POST['password'], true);
+               $sql_s = "SELECT * FROM users WHERE username='$username' and pw='$password'";
+               $rs = mysql_query($sql_s);
+               if (mysql_num_rows($rs) > 0) {
+                  echo "Login successful!";
+               } else {
+                  echo "Incorrect username or password";
+               }
+            }</pre></code>
+        This is more difficult than the previous two defenses. You will need to write a program to
+        produce a working exploit. You can use any language you like, but we recommend Python for its ease in library
+        linking.
+        <br>
+        Target: <a href="https://elecos432.org/sqlinject2/">https://elecos432.org/sqlinject2/</a> <br />
+        Submit: sql_2.txt and sql_2_src.zip (zip archive of the program files that you wrote)
+      </li>
+      <p></p>
+      <li><b>The SQL (extra credit)</b>
+        <br>
+        This target uses a different database. Your job is to use SQL injection to retrieve:
+        <ol start="a">
+          <li>The name of the database</li>
+          <li>The version of the SQL server</li>
+          <li>All of the names of the tables in the database</li>
+          <li>A secret string hidden in the database</li>
+        </ol>
+        <br>
+        Target: <a href="https://elecos432.org/sqlinject3/">https://elecos432.org/sqlinject3/</a>
+        <br>
+        Submit: sql_3.txt
+        <br>
+        For this part, the text file you submit should starts with a list of the URLs for all the queries you made to
+        learn the answers. After the list of the URLs, show the values of the database name, SQL server version, names
+        of tables and a secret string using this format:
+        <br>
+        <code><pre>
+          URL
+          URL
+          URL
+          ...
+          Name: DB name
+          Version: DB version string
+          Tables: comma separated names
+          Secret: secret string</pre></code>
+      </li>
+    </ol>
+    <br>
+    <p>
+      <b>What to submit</b> For 1.0, 1.1, and 1.2, when you successfully log in as victim, the server will provide a
+      URL-encoded version of your form inputs. Submit a text file with the specified filename containing only this line.
+      For 1.2, also submit the source code for the program you wrote, as a zip file (sql_2_src.zip). For 1.3, submit a
+      text file as specified.
+    </p>
+
+    <h5 class="mt-5">Part 2. Cross-site Request Forgery (CSRF)</h5>
+    <p>Your next task is to demonstrate CSRF vulnerabilities against the login form, and <b>BUNGLE!</b> has
+      provided two variations of their implementation for you to test. Your goal is to construct attacks that
+      surreptitiously cause the victim to log in to an account you control, thus allowing you to monitor
+      the victim’s search queries by viewing the search history for this account. For each of the defenses
+      below, create an HTML file that, when opened by a victim, logs their browser into <b>BUNGLE!</b> under
+      the account <code>attacker</code> and password <code>l33th4x</code>.</p>
+
+    <p>
+      Your solutions should not display evidence of an attack; the browser should just display a blank page.
+(If the victim later visits <b>BUNGLE!</b>, it will say “logged in as attacker”, but that’s fine for purposes of
+the project. After all, most users won’t immediately notice.)</p>
+    <ul start="0">
+      <li><b>No defenses</b>
+        <br>
+        Target: https://elecos432.org/login?csrfdefense=0&xssdefense=4
+        <br>
+        Submit: csrf_0.html
+      </li>
+      <p></p>
+      <li>
+        <b>Token validation</b>
+        <br>
+        The server sets a cookie named <code>csrf_token</code> to a random 16-byte value and also includes this value as
+        a hidden field in the login form. When the form is submitted, the server verifies that the client’s cookie
+        matches the value in the form. You are allowed to exploit the <code>XSS</code> vulnerability from Part 3 to
+        accomplish your goal.
+        <br>
+        Target: https://elecos432.org/login?csrfdefense=1&xssdefense=0
+        <br>
+        Submit: csrf_1.html
+      </li>
+      <p></p>
+      <li><b>Token validation, without XSS [Extra credit]</b>
+        <br>
+        Accomplish the same task as above (<b>Token validation</b>) without using XSS.
+        <br>
+        Target: https://elecos432.org/login?csrfdefense=1&xssdefense=4
+        <br>
+        Submit: csrf_2.html
+        <br>
+        This challenge is hard. We think it requires finding a 0-day vulnerability or an unintentional bug in our code.
+      </li>
+      <p></p>
+      <b>What to submit</b> For each part, submit an HTML file with the given name that accomplishes the
+      specified attack against the specified target URL. <b>Please remember to correctly specify the CSRF defense levels
+        in the URLs.</b> The HTML files you submit may embed inline
+      JavaScript and load jQuery from the URL:
+
+      <p style="margin-left: 40px"><code>http://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js</code></p>
+
+      It is also permissible to load the jQuery cookies library from the URL:
+      <p style="margin-left: 40px">
+        <code>https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js</code></p>
+
+      Otherwise, your code must be self contained.
+      <p></p>
+
+      <p>Test your solutions by opening them as local files in the browser in the Linux VM. Note: Since you’re sharing
+        the attacker account with other students, we’ve hard-coded it so the search history won’t actually update. You
+        can test with a different account you create to see the history change.</p>
+
+    </ul>
+    <h5 class="mt-5">Part 3. Cross-site Scripting (XSS)</h5>
+    <p>
+      Your final goal is to demonstrate XSS attacks against the <b>BUNGLE!</b> search box, which does not
+      properly filter search terms before echoing them to the results page. For each of the defenses
+      below, your goal is to construct a URL that, when loaded in the victim’s browser, correctly executes
+      the specified payload. We recommend that you begin by testing with a simple payload (e.g.,
+      <code>alert(0);</code>), then move on to the full payload. Note that you should be able to implement the
+      payload once, then use different means of encoding it to bypass the different defenses.
+    </p>
+
+    <p>
+      <b>Payload</b> The payload (the code that the attack tries to execute) will be to steal the username and the most
+      recent search the real user has performed on the <b>BUNGLE!</b> site. When a victim visits the URL you
+      create, these stolen items should be sent to the attacker’s server for collection.
+    </p>
+    <p>
+      For purposes of grading, your attack should report these events by loading the URL:</p>
+
+    <p style="margin-left: 40px"><code>http://localhost:31337/stolen?user=username&last_search=last_search</code></p>
+    <p>You can test receiving this data within the provided VM by downloading</p>
+    <p style="margin-left: 40px"><code> <a href="log_listener.py" download>log_listener.py</a></code></p> and running
+    these commands in terminal:
+    <p></p>
+    <p style="margin-left: 40px"><code>$ cd /Downloads; python log_listener.py</code></p>
+    <p>
+      and observing the HTTP GET request that your payload generates. To further test that your HTTP
+      server is running, try navigating to:</p>
+    <p style="margin-left: 40px"><code>http://localhost:31337</code></p>
+    <p><b>Defenses</b> There are five levels of defense. In each case, you should submit the simplest attack you can
+      find that works against that defense; you should not simply attack the highest level and submit your solution for
+      that level for every level. Try to use a different technique for each defense. The Python code that implements
+      each defense is shown below, along with the target URL and the filename you should submit.</p>
+
+    <ol start="0">
+      <li>
+        <b>No defenses</b>
+        <br>
+        Target: <a href="https://elecos432.org/search?xssdefense=0">https://elecos432.org/search?xssdefense=0</a>
+        <br>
+        Submit: xss_0.txt
+        <br>
+        Also submit a human-readable version of your payload code (as opposed to the form encoded into the URL) in a
+        file named: xss_payload.html
+      </li>
+      <p>
+        <li>
+          <b>Remove “script”</b>
+          <br>
+          <code>filtered = re.sub(r&quot;(?i)script&quot;, &quot;&quot;, input)</code>
+          <br>
+          Target: <a href="https://elecos432.org/search?xssdefense=1">https://elecos432.org/search?xssdefense=1</a>
+          <br>
+          Submit: xss_1.txt
+        </li>
+      </p>
+      <p>
+        <li><b>Remove several tags</b>
+          <br>
+          <code>filtered = re.sub(r&quot;(?i)script|&lt;img|&lt;body|&lt;style|&lt;meta|&lt;embed|&lt;object&quot;,&quot;&quot;, input)</code>
+          <br>
+          Target: <a href="https://elecos432.org/search?xssdefense=2">https://elecos432.org/search?xssdefense=2</a>
+          <br>
+          Submit: xss_2.txt
+        </li>
+      </p>
+
+      <p>
+        <li><b>Remove some punctuation</b>
+          <br>
+          <code>filtered = re.sub(r"[;'\"]", "", input)</code>
+          <br>
+          Target: <a href="https://elecos432.org/search?xssdefense=3">https://elecos432.org/search?xssdefense=3</a>
+          <br>
+          Submit: xss_3.txt
+        </li>
+      </p>
+
+      <p>
+        <li><b>Encode &lt; and &gt; [Extra credit]</b>
+          <br>
+          <code>filtered = input.replace("<", "&amp;lt;").replace(">", "&amp;gt;")</code>
+          <br>
+          Target: <a href="https://elecos432.org/search?xssdefense=4">https://elecos432.org/search?xssdefense=4</a>
+          <br>
+          Submit: xss_4.txt
+          <br>
+          This challenge is hard. We think it requires finding a 0-day vulnerability or an unintentional bug in our
+          code.
+        </li>
+      </p>
+
+      <p>
+        <b>What to submit</b> Your submission for each level of defense will be a text file with the specified filename
+        that contains a single line consisting of a URL. When this URL is loaded in a victim’s
+        browser, it should execute the specified payload against the specified target. <b>Please remember to correctly
+          specify the XSS defense levels in your URLs (if you have nested URLs, specify the levels in the nested ones
+          too!). </b>
+
+        The payload encoded in
+        your URLs may embed inline JavaScript and load jQuery from the URL:
+      <p style="margin-left: 40px"><code>http://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js</code></p>
+
+      It is also permissible to load the jQuery cookies library from the URL:
+
+      <p style="margin-left: 40px">
+        <code>https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js</code></p>
+      Otherwise, your code must be self contained. Test your solutions with the browser in the Linux VM.
+
+
+      </p>
+
+    </ol>
+    <h5 class="mt-5">Part 4. Writeup: Better Defenses</h5>
+    <p>For each of the three kinds of attacks (SQL injection, CSRF, and XSS), write a paragraph of advice
+      for the <b>BUNGLE!</b> developers recommending what techniques they should use to defend themselves. </p>
+    <p>
+      <b>What to submit</b> A text file named <code>writeup.txt</code> containing your security recommendations.
+
+
+    <h5 class="mt-5">Submission Checklist</h5>
+    <p>Where applicable, your solutions may contain embedded JavaScript. They are allowed to load only the exact
+      Javascript libraries specified above, and must be otherwise self-contained. Test your solutions with the browser
+      provided in the VM.</p>
+    <p>The solutions you submit for Part 2 (CSRF) and Part 3 (XSS) must include the <code>csrfdefense=n</code> or
+      <code>xssdefense=n</code> parameter in the target URL, as specified in each task. You may not attempt to subvert
+      the mechanism for changing the level of defense in your attacks. Submit your files as a single zip file on <a
+        href="https://www.gradescope.com">Gradescope</a>. Your zip file should have the following structure:</p>
+    <ul style="list-style-type:none;">
+      <!-- <li>&#9633; <code>README.txt</code> - Edit the provided file.  Line separated file with the name and NetID of each member of the group. </li> -->
+      <li>&#9633; <code>part1</code> </li>
+      <ul style="list-style-type:none;">
+        <li>&#9633; <code>sql_0.txt</code> - 1.0 No defenses
+        </li>
+        <li>&#9633; <code>sql_1.txt</code> - 1.1 Simple escaping
+        </li>
+        <li>&#9633; <code>sql_2.txt</code> - 1.2 Escaping and Hashing
+        </li>
+        <li>&#9633; <code>sql_2_src.zip</code> - 1.2 Escaping and Hashing source code
+        </li>
+        <li>&#9633; <code>sql_3.txt</code> - 1.3 The SQL [Extra credit]
+        </li>
+      </ul>
+      <li>&#9633; <code>part2</code> </li>
+      <ul style="list-style-type:none;">
+        <li>&#9633; <code>csrf_0.html</code> - 2.0 No defenses
+        </li>
+        <li>&#9633; <code>csrf_1.html</code> - 2.1 Token validation
+        </li>
+        <li>&#9633; <code>csrf_2.html</code> - 2.2 Token validation, without XSS [Extra credit]
+        </li>
+      </ul>
+      <li>&#9633; <code>part3</code> </li>
+      <ul style="list-style-type:none;">
+        <li>&#9633; <code>xss_payload.html</code> - 3.0 No defenses
+        </li>
+        <li>&#9633; <code>xss_0.txt</code> - 3.0 No defenses
+        </li>
+        <li>&#9633; <code>xss_1.txt</code> - 3.1 Remove "script"
+        </li>
+        <li>&#9633; <code>xss_2.txt</code> - 3.2 Remove several tags
+        </li>
+        <li>&#9633; <code>xss_3.txt</code> - 3.3 Remove some punctuation
+        </li>
+        <li>&#9633; <code>xss_4.txt</code> - 3.4 Encode < and> [Extra credit]
+        </li>
+      </ul>
+      <li>&#9633; <code>part4</code> </li>
+      <ul style="list-style-type:none;">
+        <li>&#9633; <code>writeup.txt</code> - 4.0 security recommendations
+        </li>
+      </ul>
+
+  </div>
+
+
+
+  </div>
+
+  <!-- Bootstrap core JavaScript -->
+  <script src="vendor/jquery/jquery.min.js"></script>
+  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+</html>
