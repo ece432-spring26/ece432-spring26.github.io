@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>COS 432/ECE 432 - Spring 2026</title>
+
+  <!-- Bootstrap core CSS -->
+  <link href="../../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Custom styles for this template -->
+  <link href="../../css/logo-nav.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container">
+      <a class="navbar-brand" href="../../index.html">
+        <img src="../../images/key.svg" width="60" height="60" alt=""> COS 432/ECE 432 - Spring 2026
+      </a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive"
+        aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarResponsive">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="../../index.html">Overview
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="../../schedule.html">Schedule</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="../../assignments.html">Assignments</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="../../resources.html">Resources</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Page Content -->
+  <div class="container-fluid">
+    <h5 class="mt-5">Assignment 6: AI Security (Group Assignment)</h5>
+    <ul class="text-right list-inline">
+      <li class="list-inline-item"><a class="social-icon text-xs-center" target="_blank"
+          href="https://www.gradescope.com">Submit Files &uArr;</a></li>
+    </ul>
+
+    <h5 class="mt-5">Introduction</h5>
+    <p>
+      In this project, you will get hands-on experience with security in AI systems -- from perspectives of both adversaries and defenders.
+      Particularly, we will look into security vulnerabilities in two common AI applications:
+    </p>
+    <ul>
+      <li>Image classification</li>
+      <li>Large language models (LLMs)</li>
+    </ul>
+    <p>
+      This is a group assignment, and must be done in groups of 2 only.
+    </p>
+
+
+
+    <h5 class="mt-5">Objectives</h5>
+    <ul>
+      <li>Understand how adversarial attacks against AI models can induce unwanted behaviors -- e.g., misclassification or generation of forbidden text. </li>
+      <li>Learn to distinguish different threat models of these attacks.</li>
+      <li>Gain experience defending against these attacks.</li>
+      <li>Realize that AI security is a complex cat-and-mouse game -- there will (most likely) always be new adaptive attacks and defenses.</li>
+    </ul>
+
+
+    <h5 class="mt-5">Getting Started</h5>
+    <p>
+      You will be writing code, running experiments, and answering reflection questions in two Colab notebooks:
+    </p>
+    <ul>
+      <li><a href="https://colab.research.google.com/drive/1D4SwXUPJk6DsPdxyRgJkqEsHAvl9U2m6?usp=sharing"><b>PatchGuard: A Robust, Adaptive Defense for Image Classifiers</b>
+      </a></li>
+      <li><a href="https://colab.research.google.com/drive/1HNd2cIhx9kc-N-HEgpkYeKQanDqMpyQi?usp=sharing"><b>Breaking LLMs: Adversarial Prompting and LLM Safety</b></a></li>
+    </ul>
+    <p>
+    You will need to connect to T4 GPU in the Colab notebooks to run these experiments. To ensure access to a T4 GPU anytime you need, you will need a <b>Colab Pro</b> account.
+    With Princeton email, you can get a <b>"free, 1 year subscription to Colab Pro for Education."</b> See <a href="https://colab.research.google.com/signup">https://colab.research.google.com/signup</a> for more details.
+    </p>
+
+    <h5 class="mt-5"> Tasks and Deliverables </h5>
+    <p>We do not assume you have taken any prior coursework or have in-depth experience with machine learning.
+    Therefore, the coding workload of this assignment will be manageable, with most of the attack & defense implementation code provided for you.
+      We intentionally left a small portion of the code for you to fill in, which will require the understanding of basic concepts regarding the attacks & defenses in this assignment (already covered in lectures).
+      Additionally, you are asked to explore different parameters of the attacks & defenses, and report your findings in the reflection questions.
+      You are encouraged to interpret the code base provided, and even modify it if you want to try out more advanced attack & defense techniques.
+    </p>
+    <p>
+      Briefly speaking, you will:
+    </p>
+    <ul>
+      <li>See how adversarial patch attacks can fool image classifiers (<code>BasicCNN</code>). Then finish and run the PatchGuard defense to defend against it.</li>
+      <li>Attack a LLM (<code>Qwen2.5-1.5B-Instruct</code>) to output a forbidden text (<code>ZXQ-417::ECE432_IS_FUN::LOCKED</code>) defined by us. Specifically, you will be 1) designing blackbox prompts, 2) running gradient-based whitebox attacks, and 3) running blackbox transfer attacks using gradient-based attacks on another LLM (<code>Qwen3-0.6B</code>) as a proxy.</li>
+    </ul>
+    
+    <h5 class="mt-5">Useful Links</h5>
+    <ul>
+      <li><a href="https://docs.pytorch.org/tutorials/beginner/deep_learning_60min_blitz.html">Deep Learning with PyTorch: A 60 Minute Blitz</a></li>
+      <li><a href="https://huggingface.co/learn/llm-course/en/chapter2/3">Hugging Face LLM Course</a></li>
+      <li><a href="https://www.usenix.org/system/files/sec21-xiang.pdf">PatchGuard Paper (PatchGuard: A Provably Robust Defense against Adversarial Patches via Small Receptive Fields and Masking)</a></li>
+      <li><a href="https://arxiv.org/pdf/2307.15043">LLM gradient-based attack paper (Universal and Transferable Adversarial Attacks on Aligned Language Models)</a></li>
+      <li><a href="https://arxiv.org/pdf/2310.03693">LLM Fine-tuning Safety Risks</a></li>
+    </ul>
+
+    <h5 class="mt-5">Submission Checklist</h5>
+    <p>Submit your files as a single zip file to <a href="https://www.gradescope.com">Gradescope</a>. Make sure you
+      select all your group members when submitting. The zip file should contain the files / directories below:</p>
+    <ul style="list-style-type:none;">
+      <li>&#9633; <code>A6_PatchGuard.ipynb</code> - The .ipynb version of the PatchGuard Colab notebook (Click "File" -> "Download .ipynb")</li>
+      <li>&#9633; <code>A6_PatchGuard.pdf</code> - The PDF version of the PatchGuard Colab notebook (Click "File" -> "Print" -> "Save as PDF")</li>
+      <li>&#9633; <code>A6_Jailbreaking.ipynb</code> - The .ipynb version of the LLM jailbreaking Colab notebook (Click "File" -> "Download .ipynb")</li>
+      <li>&#9633; <code>A6_Jailbreaking.pdf</code> - The PDF version of the LLM jailbreaking Colab notebook (Click "File" -> "Print" -> "Save as PDF")</li>
+    </ul>
+    Make sure to share your copies of the notebooks (Viewer -> Everyone) before submission, and include the links in the Meta Info section at the top of the notebooks (so we can access them).
+    <br/>
+    <br/>
+    <br/>
+
+
+
+  </div>
+  
+
+
+
+  </div>
+
+  <!-- Bootstrap core JavaScript -->
+  <script src="vendor/jquery/jquery.min.js"></script>
+  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+</html>
